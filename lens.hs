@@ -10,15 +10,29 @@ data Lens s t a b = Lens {
     v = v2 . v1
     u (d, s) = u1 (u2 (d, v1 s), s)
 
--- Pair example
+-- Projection on tuples
 p1 :: Lens (a, c) (b, c) a b
-p1 = Lens v u where
-    v = fst
-    u = (\(b, (_, c)) -> (b, c))
+p1 = Lens view update where
+    view = fst
+    update (b, (_, c)) = (b, c)
 
-thrice = p1 |.| p1 |.| p1
-nest = (((1, 'a'), 2.0), True)
+p2 :: Lens (a, b) (a, c) b c
+p2 = Lens view update where
+    view = snd
+    update (c, (a, _)) = (a, c)
 
+--How to use it
+--thrice = p1 |.| p1 |.| p1
+--nest = (((1, 'a'), 2.0), True)
 --view thrice nest == 1
 --update thrice ("hi", nest) == ((("hi", 'a'), 2.0), True)
+
+-- Control the sign of an integer
+sign :: Lens Integer Integer Bool Bool
+sign = Lens view update where
+    view = (>= 0)
+    update (makePositive, n) = if makePositive then abs n else -(abs n) 
+
+-- view sign 4 == True
+-- update sign (False, 4) == -4
 
