@@ -5,8 +5,8 @@ data Lens s t a b = Lens {
 }
 
 -- Composition operator
-(|.|) :: Lens s t a b -> Lens a b c d -> Lens s t c d
-(Lens v1 u1) |.| (Lens v2 u2) = Lens v u where
+(|.|) :: Lens a b c d -> Lens s t a b -> Lens s t c d
+(Lens v2 u2) |.| (Lens v1 u1) = Lens v u where
     v = v2 . v1
     u (d, s) = u1 (u2 (d, v1 s), s)
 
@@ -28,11 +28,14 @@ p2 = Lens view update where
 --update thrice ("hi", nest) == ((("hi", 'a'), 2.0), True)
 
 -- Control the sign of an integer
-sign :: Lens Integer Integer Bool Bool
+sign :: (Ord n, Num n) => Lens n n Bool Bool
 sign = Lens view update where
     view = (>= 0)
     update (makePositive, n) = if makePositive then abs n else -(abs n) 
 
 -- view sign 4 == True
 -- update sign (False, 4) == -4
+
+
+
 
